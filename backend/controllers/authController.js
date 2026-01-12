@@ -38,8 +38,40 @@ exports.registerUser = async (req, res) => {
 };
 
 // login User
-exports.loginUser = async (req, res) => {};
+exports.loginUser = async (req, res) => {
+    const { email, password } = req.body;
+    // validation check for missing fields
+    if (!email || !password) {
+        return res.status(400).json({ message: "Please fill all required fields" });
+    }
+    try {
+        // check if user exists
+        const user = await User.findOne({ email });
+        if (!user || !(await user.matchPassword(password))) {
+            return res.status(400).json({ message: "Invalid email or password" });
+        }
+        res.status(200).json({
+            id: user._id,
+            user,
+            token: generateToken(user._id),
+        });
+    } catch (error) {
+        console.error("Error logging in user:", error);
+        res.status(500).json({ message: "Server error" });
+    }
+};
 
 
 // get User Info
-exports.getUserInfo = async (req, res) => {};
+exports.getUserInfo = async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id).select("-password");
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        res.status(200).json(user);
+    } catch (error) {
+        console.error("Error fetching user info:", error);
+        res.status(500).json({ message: "Server error" });
+    }
+};
