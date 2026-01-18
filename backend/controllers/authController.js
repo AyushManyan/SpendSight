@@ -26,9 +26,12 @@ exports.registerUser = async (req, res) => {
         // create new user
         const user = await User.create({ fullName, email, password, profileImageUrl });
         console.log("User registered:", user);
+        // Remove password from user object before sending
+        const userObj = user.toObject();
+        delete userObj.password;
         res.status(201).json({
             id: user._id,
-            user,
+            user: userObj,
             token: generateToken(user._id),
         });
     } catch (error) {
@@ -50,9 +53,12 @@ exports.loginUser = async (req, res) => {
         if (!user || !(await user.matchPassword(password))) {
             return res.status(400).json({ message: "Invalid email or password" });
         }
+        // Remove password from user object before sending
+        const userObj = user.toObject();
+        delete userObj.password;
         res.status(200).json({
             id: user._id,
-            user,
+            user: userObj,
             token: generateToken(user._id),
         });
     } catch (error) {

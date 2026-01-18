@@ -5,7 +5,7 @@ import Input from '../../components/Inputs/Input'
 import { validateEmail } from '../../utils/helper'
 import axiosInstance from '../../utils/axiosInstance'
 import { API_PATHS } from '../../utils/apiPath'
-import { UserContext } from '../../context/userContext'
+import { UserContext } from '../../context/UserContext'
 
 const Login = () => {
   const [email, setEmail] = useState('')
@@ -40,7 +40,7 @@ const Login = () => {
       const { token, user } = response.data;
       if(token){
         localStorage.setItem('token', token);
-        updateUser(user);
+        updateUser(user); // updateUser now also syncs localStorage
         navigate("/dashboard");
       }
     }catch(error){
