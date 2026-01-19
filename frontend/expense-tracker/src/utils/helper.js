@@ -14,3 +14,10 @@ export const getInitials = (name) => {
     }
     return initals;
 }
+
+export const addThousandSeparators = (num) => {
+    if(num == null || isNaN(num)) return "";
+    const [integerPart, fractionalPart] = num.toString().split(".");
+    const withSeparators = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    return fractionalPart ? `${withSeparators}.${fractionalPart}` : withSeparators;
+}
