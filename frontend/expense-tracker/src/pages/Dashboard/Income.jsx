@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import DashboardLayout from '../../components/Layout/DashboardLayout'
+import Loading from '../../components/Loading';
 import IncomeOverView from '../../components/Income/IncomeOverView'
 import axiosInstance from '../../utils/axiosInstance';
 import { API_PATHS } from '../../utils/apiPath';
@@ -81,7 +82,6 @@ const Income = () => {
 
   // delete income
   const deleteIncome = async (id) => {
-    console.log("id on delete ", id);
     
     try {
       await axiosInstance.delete(API_PATHS.INCOME.DELETE_INCOME(id));
@@ -128,43 +128,42 @@ const Income = () => {
   return (
     <DashboardLayout active="Income">
       <div className='my-5 mx-auto'>
-        <div className='grid grid-cols-1 gap-6'>
-          <div>
-            <IncomeOverView
-              transactions={incomeData}
-              onAddIncome={() => setOpenAddIncomeModal(true)}
-            />
-          </div>
-
-          <IncomeList
-            transactions={incomeData}
-            onDelete={(id) => setOpenDeleteAlert({ show: true, data: id })}
-            onDownload={handleDownloadIncomeDetails}
-          />
-
-        </div>
-
-        <Modal
-          isOpen={openAddIncomeModal}
-          onClose={() => setOpenAddIncomeModal(false)}
-          title="Add Income"
-        >
-          <AddIncomeForm onAddIncome={handleAddIncome} />
-        </Modal>
-
-        <Modal
-          isOpen={openDeleteAlert.show}
-          onClose={() => setOpenDeleteAlert({ show: false, data: null })}
-          title="Delete Income"
-        >
-
-          <DeleteAlert
-            content="Are you sure you want to delete this income?"
-            onDelete={() => deleteIncome(openDeleteAlert.data)}
-          />
-
-        </Modal>
-
+        {loading ? (
+          <Loading />
+        ) : (
+          <>
+            <div className='grid grid-cols-1 gap-6'>
+              <div>
+                <IncomeOverView
+                  transactions={incomeData}
+                  onAddIncome={() => setOpenAddIncomeModal(true)}
+                />
+              </div>
+              <IncomeList
+                transactions={incomeData}
+                onDelete={(id) => setOpenDeleteAlert({ show: true, data: id })}
+                onDownload={handleDownloadIncomeDetails}
+              />
+            </div>
+            <Modal
+              isOpen={openAddIncomeModal}
+              onClose={() => setOpenAddIncomeModal(false)}
+              title="Add Income"
+            >
+              <AddIncomeForm onAddIncome={handleAddIncome} />
+            </Modal>
+            <Modal
+              isOpen={openDeleteAlert.show}
+              onClose={() => setOpenDeleteAlert({ show: false, data: null })}
+              title="Delete Income"
+            >
+              <DeleteAlert
+                content="Are you sure you want to delete this income?"
+                onDelete={() => deleteIncome(openDeleteAlert.data)}
+              />
+            </Modal>
+          </>
+        )}
       </div>
     </DashboardLayout>
   )

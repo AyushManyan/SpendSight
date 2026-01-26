@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import DashboardLayout from '../../components/Layout/DashboardLayout'
+import Loading from '../../components/Loading';
 import DeleteAlert from '../../components/DeleteAlert';
 import Modal from '../../components/Modal';
 import { API_PATHS } from '../../utils/apiPath';
@@ -131,56 +132,52 @@ const Expense = () => {
   return (
     <DashboardLayout active="Expense">
       <div className='my-5 mx-auto'>
-        <div className='grid grid-cols-1 gap-6'>
-          <div>
-            <ExpenseOverView
-              transactions={expenseData}
-              onAddExpense={() => setOpenAddExpenseModal(true)}
-            />
-          </div>
-
-          <ExpenseList
-            transactions={expenseData}
-            onDelete={(id) => setOpenDeleteAlert({ show: true, data: id })}
-            onDownload={handleDownloadExpenseDetails}
-          />
-
-        </div>
-
-        <Modal
-          isOpen={openAddExpenseModal}
-          onClose={() => setOpenAddExpenseModal(false)}
-          title="Add Expense"
-        >
-          <AddExpenseForm onAddExpense={handleAddExpense} />
-        </Modal>
-
-        <Modal
-          isOpen={openDeleteAlert.show}
-          onClose={() => setOpenDeleteAlert({ show: false, data: null })}
-          title="Delete Expense"
-        >
-
-          <DeleteAlert
-            content="Are you sure you want to delete this expense?"
-            onDelete={() => deleteExpense(openDeleteAlert.data)}
-          />
-
-        </Modal>
-
-        <Modal
-          isOpen={openDeleteAlert.show}
-          onClose={() => setOpenDeleteAlert({ show: false, data: null })}
-          title="Delete Expense"
-        >
-
-          <DeleteAlert
-            content="Are you sure you want to delete this expense?"
-            onDelete={() => deleteExpense(openDeleteAlert.data)}
-          />
-
-        </Modal>
-
+        {loading ? (
+          <Loading />
+        ) : (
+          <>
+            <div className='grid grid-cols-1 gap-6'>
+              <div>
+                <ExpenseOverView
+                  transactions={expenseData}
+                  onAddExpense={() => setOpenAddExpenseModal(true)}
+                />
+              </div>
+              <ExpenseList
+                transactions={expenseData}
+                onDelete={(id) => setOpenDeleteAlert({ show: true, data: id })}
+                onDownload={handleDownloadExpenseDetails}
+              />
+            </div>
+            <Modal
+              isOpen={openAddExpenseModal}
+              onClose={() => setOpenAddExpenseModal(false)}
+              title="Add Expense"
+            >
+              <AddExpenseForm onAddExpense={handleAddExpense} />
+            </Modal>
+            <Modal
+              isOpen={openDeleteAlert.show}
+              onClose={() => setOpenDeleteAlert({ show: false, data: null })}
+              title="Delete Expense"
+            >
+              <DeleteAlert
+                content="Are you sure you want to delete this expense?"
+                onDelete={() => deleteExpense(openDeleteAlert.data)}
+              />
+            </Modal>
+            <Modal
+              isOpen={openDeleteAlert.show}
+              onClose={() => setOpenDeleteAlert({ show: false, data: null })}
+              title="Delete Expense"
+            >
+              <DeleteAlert
+                content="Are you sure you want to delete this expense?"
+                onDelete={() => deleteExpense(openDeleteAlert.data)}
+              />
+            </Modal>
+          </>
+        )}
       </div>
     </DashboardLayout>
   )
