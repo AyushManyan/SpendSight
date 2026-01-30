@@ -9,6 +9,7 @@ const incomeRoutes = require("./routes/incomeRoutes");
 const expenseRoutes = require("./routes/expenseRoutes");
 const dashboardRoutes = require("./routes/dashboardRoutes");
 const billRoutes = require("./routes/billRoutes");
+const otpRoutes = require("./routes/otpRoutes");
 
 const app = express();
 
@@ -33,6 +34,8 @@ app.use("/api/v1/expense", expenseRoutes);
 app.use("/api/v1/dashboard", dashboardRoutes);
 
 app.use("/api/v1/bill", billRoutes);
+
+app.use("/api/v1/opt",otpRoutes)
 
 // Serve static files from the "uploads" directory
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
