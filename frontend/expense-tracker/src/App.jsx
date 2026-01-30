@@ -13,6 +13,7 @@ import Home from './pages/Dashboard/Home'
 import Expense from './pages/Dashboard/Expense'
 import UserProvider from './context/UserContext'
 import { Toaster } from 'react-hot-toast';
+import OtpVerification from './pages/Otp/OtpVerification'
 
 const App = () => {
   return (
@@ -28,6 +29,7 @@ const App = () => {
             <Route path="/signUp" element={<SignUp />} />
             <Route path="/income" element={<Income />} />
             <Route path="/expenses" element={<Expense />} />
+            <Route path="/otp-verification" element={<OtpVerification />} />
 
           </Routes>
         </Router>

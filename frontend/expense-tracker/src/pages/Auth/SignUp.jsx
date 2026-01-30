@@ -50,9 +50,7 @@ const SignUp = () => {
     }
     setError(null);
     
-    // signup api
     try {
-
       // upload image if present
       let profileImageUrl;
       if(profilePic){
@@ -60,24 +58,28 @@ const SignUp = () => {
         profileImageUrl = imgUploadRes.imageUrl || "";
       }
 
-      const response = await axiosInstance.post(API_PATHS.AUTH.REGISTER,{
+      // 1. Send OTP to email
+      await axiosInstance.post(API_PATHS.OTP.SEND_OTP, { email });
+
+
+      // 2. Prepare signup data (do not send to backend yet)
+      const signupData = {
         fullName,
         email,
         password,
         profileImageUrl
-      });
+      };
 
-      const {token, user} = response.data;
-      if(token){
-        localStorage.setItem("token",token);
-        updateUser(user); // updateUser now also syncs localStorage
-        navigate("/dashboard");
-      }
+      // 3. Redirect to OTP verification page, pass email and signupData
+      navigate('/otp-verification', { state: { email, signupData } });
+      toast.success("OTP sent to your email. Please verify to complete signup.");
     } catch (error) {
       if(error.response && error.response.data.message){
         setError(error.response.data.message);
+        toast.error(error.response.data.message);
       }else{
         setError("Something went Wrong. Please try again.");
+        toast.error("Something went Wrong. Please try again.");
       }
     }
   }
