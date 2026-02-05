@@ -5,11 +5,11 @@ const Income = require("../models/Income");
 // add income
 exports.addIncome = async (req, res) => {
     const userId = req.user.id;
-    try{
-        const {icon, source, amount, date} = req.body;
+    try {
+        const { icon, source, amount, date } = req.body;
         // validate
-        if(!source || !amount || !date){
-            return res.status(400).json({message: "Please fill all the fields"});
+        if (!source || !amount || !date) {
+            return res.status(400).json({ message: "Please fill all the fields" });
         }
 
         const newIncome = new Income({
@@ -20,11 +20,11 @@ exports.addIncome = async (req, res) => {
             date: new Date(date)
         });
         await newIncome.save();
-        res.status(201).json({newIncome})
+        res.status(201).json({ newIncome })
 
-    }catch(error){
+    } catch (error) {
         console.error("Error adding income:", error);
-        res.status(500).json({message: "Server Error"});
+        res.status(500).json({ message: "Server Error" });
     }
 }
 
@@ -32,28 +32,28 @@ exports.addIncome = async (req, res) => {
 // get all income
 exports.getAllIncome = async (req, res) => {
     const userId = req.user.id;
-    try{
-        const incomes =  await Income.find({userId}).sort({date: -1});
-        res.status(200).json({incomes});
-    }catch(error){
+    try {
+        const incomes = await Income.find({ userId }).sort({ date: -1 });
+        res.status(200).json({ incomes });
+    } catch (error) {
         console.error("Error fetching incomes:", error);
-        res.status(500).json({message: "Server Error"});
+        res.status(500).json({ message: "Server Error" });
     }
 }
 
 
 // delete income
 exports.deleteIncome = async (req, res) => {
-    try{
+    try {
         const checkIncome = await Income.findById(req.params.id);
-        if(!checkIncome){
-            return res.status(404).json({message: "Income not found"});
+        if (!checkIncome) {
+            return res.status(404).json({ message: "Income not found" });
         }
         await Income.findOneAndDelete(req.params.id);
-        res.status(200).json({message: "Income deleted successfully"});
-    }catch(error){
+        res.status(200).json({ message: "Income deleted successfully" });
+    } catch (error) {
         console.error("Error deleting income:", error);
-        res.status(500).json({message: "Server Error"});
+        res.status(500).json({ message: "Server Error" });
     }
 
 }
@@ -61,8 +61,8 @@ exports.deleteIncome = async (req, res) => {
 // download income as excel
 exports.downloadIncomeExcel = async (req, res) => {
     const userId = req.user.id;
-    try{
-        const incomes = await Income.find({userId}).sort({date: -1});
+    try {
+        const incomes = await Income.find({ userId }).sort({ date: -1 });
 
         // prepare data for excel
         const data = incomes.map((item) => ({
@@ -77,8 +77,8 @@ exports.downloadIncomeExcel = async (req, res) => {
         xlsx.writeFile(wb, "IncomeData.xlsx");
         res.download("IncomeData.xlsx");
 
-    }catch(error){
+    } catch (error) {
         console.error("Error downloading income excel:", error);
-        res.status(500).json({message: "Server Error"});
+        res.status(500).json({ message: "Server Error" });
     }
 }

@@ -5,11 +5,11 @@ const Expense = require("../models/Expense");
 // add expense
 exports.addExpense = async (req, res) => {
     const userId = req.user.id;
-    try{
-        const {icon, category, amount, date} = req.body;
+    try {
+        const { icon, category, amount, date } = req.body;
         // validate
-        if(!category || !amount || !date){
-            return res.status(400).json({message: "Please fill all the fields"});
+        if (!category || !amount || !date) {
+            return res.status(400).json({ message: "Please fill all the fields" });
         }
 
         const newExpense = new Expense({
@@ -20,11 +20,11 @@ exports.addExpense = async (req, res) => {
             date: new Date(date)
         });
         await newExpense.save();
-        res.status(201).json({newExpense})
+        res.status(201).json({ newExpense })
 
-    }catch(error){
+    } catch (error) {
         console.error("Error adding income:", error);
-        res.status(500).json({message: "Server Error"});
+        res.status(500).json({ message: "Server Error" });
     }
 }
 
@@ -32,25 +32,25 @@ exports.addExpense = async (req, res) => {
 // get all expense
 exports.getAllExpense = async (req, res) => {
     const userId = req.user.id;
-    try{
-        const expenses =  await Expense.find({userId}).sort({date: -1});
-        res.status(200).json({expenses});
-    }catch(error){
+    try {
+        const expenses = await Expense.find({ userId }).sort({ date: -1 });
+        res.status(200).json({ expenses });
+    } catch (error) {
         console.error("Error fetching expenses:", error);
-        res.status(500).json({message: "Server Error"});
+        res.status(500).json({ message: "Server Error" });
     }
 }
 
 
 // delete expense
 exports.deleteExpense = async (req, res) => {
-    try{
-        
+    try {
+
         await Expense.findOneAndDelete(req.params.id);
-        res.status(200).json({message: "Expense deleted successfully"});
-    }catch(error){
+        res.status(200).json({ message: "Expense deleted successfully" });
+    } catch (error) {
         console.error("Error deleting expense:", error);
-        res.status(500).json({message: "Server Error"});
+        res.status(500).json({ message: "Server Error" });
     }
 
 }
@@ -58,8 +58,8 @@ exports.deleteExpense = async (req, res) => {
 // download expense as excel
 exports.downloadExpenseExcel = async (req, res) => {
     const userId = req.user.id;
-    try{
-        const expenses = await Expense.find({userId}).sort({date: -1});
+    try {
+        const expenses = await Expense.find({ userId }).sort({ date: -1 });
         // prepare data for excel
         const data = expenses.map((item) => ({
             Category: item.category,
@@ -73,8 +73,8 @@ exports.downloadExpenseExcel = async (req, res) => {
         xlsx.writeFile(wb, "ExpenseData.xlsx");
         res.download("ExpenseData.xlsx");
 
-    }catch(error){
+    } catch (error) {
         console.error("Error downloading expense excel:", error);
-        res.status(500).json({message: "Server Error"});
+        res.status(500).json({ message: "Server Error" });
     }
 }
