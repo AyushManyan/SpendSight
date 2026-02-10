@@ -33,5 +33,9 @@ export const API_PATHS = {
     OTP:{
         SEND_OTP: "api/v1/opt/send-otp",
         VERIFY_OTP: "api/v1/opt/verify-otp"
+    },
+
+    INSIGHTS:{
+        GET_INSIGHTS: "api/v1/insights"
     }
 };

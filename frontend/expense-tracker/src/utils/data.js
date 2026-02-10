@@ -24,8 +24,16 @@ export const SIDE_MENU_DATA =[
         icon: LuHandCoins,
         path:"/expenses",
     },
+
     {
         id: "04",
+        label:"Insights",
+        icon: LuLayoutDashboard,
+        path:"/insights"
+    },
+
+    {
+        id: "05",
         label:"Logout",
         icon: LuLogOut,
         path:"logout"

@@ -45,7 +45,7 @@ const SideMenu = () => {
           const isActive = item.path !== 'logout' && location.pathname === item.path;
           return (
             <button key={`menu_${index}`}
-              className={`flex items-center gap-4 text-[15px] ${isActive ? "text-white bg-primary" : ""} py-3 px-6  w-full rounded-lg mb-3`}
+              className={`flex hover:cursor-pointer items-center gap-4 text-[15px] ${isActive ? "text-white bg-primary" : ""} py-3 px-6  w-full rounded-lg mb-3`}
               onClick={() => {
                 handleClick(item.path);
               }}>
