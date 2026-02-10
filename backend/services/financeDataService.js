@@ -2,21 +2,21 @@ const mongoose = require("mongoose");
 const Income = require("../models/Income");
 const Expense = require("../models/Expense");
 
-exports.fetchIncomeData = async (userId, tilldays = 30) => {
-  const fromDate = new Date();
-  fromDate.setDate(fromDate.getDate() - tilldays);
+exports.fetchIncomeData = async (userId, startDate, endDate) => {
+  const fromDate = new Date(startDate);
+  const toDate = new Date(endDate);
 
   const matchUserId = mongoose.Types.ObjectId.isValid(userId)
     ? new mongoose.Types.ObjectId(userId)
     : userId;
 
   const totalIncome = await Income.aggregate([
-    { $match: { userId: matchUserId } },
+    { $match: { userId: matchUserId, date: { $gte: fromDate, $lte: toDate } } },
     { $group: { _id: null, total: { $sum: "$amount" } } },
   ]);
 
   const incomeByCategory = await Income.aggregate([
-    { $match: { userId: matchUserId, date: { $gte: fromDate } } },
+    { $match: { userId: matchUserId, date: { $gte: fromDate, $lte: toDate } } },
     { $group: { _id: "$source", totalAmount: { $sum: "$amount" } } },
   ]);
 
@@ -26,21 +26,21 @@ exports.fetchIncomeData = async (userId, tilldays = 30) => {
   };
 };
 
-exports.fetchExpenseData = async (userId, tilldays = 30) => {
-  const fromDate = new Date();
-  fromDate.setDate(fromDate.getDate() - tilldays);
+exports.fetchExpenseData = async (userId, startDate, endDate) => {
+  const fromDate = new Date(startDate);
+  const toDate = new Date(endDate);
 
   const matchUserId = mongoose.Types.ObjectId.isValid(userId)
     ? new mongoose.Types.ObjectId(userId)
     : userId;
 
   const totalExpense = await Expense.aggregate([
-    { $match: { userId: matchUserId } },
+    { $match: { userId: matchUserId, date: { $gte: fromDate, $lte: toDate } } },
     { $group: { _id: null, total: { $sum: "$amount" } } },
   ]);
 
   const expenseByCategory = await Expense.aggregate([
-    { $match: { userId: matchUserId, date: { $gte: fromDate } } },
+    { $match: { userId: matchUserId, date: { $gte: fromDate, $lte: toDate } } },
     { $group: { _id: "$category", totalAmount: { $sum: "$amount" } } },
   ]);
 

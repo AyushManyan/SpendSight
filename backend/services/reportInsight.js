@@ -2,7 +2,7 @@ const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-exports.reportInsight = async (incomeData, expenseData, tilldays) => {
+exports.reportInsight = async (incomeData, expenseData, startDate, endDate) => {
   try {
     const model = genAI.getGenerativeModel({
       model: "gemini-3-flash-preview",
@@ -19,7 +19,7 @@ exports.reportInsight = async (incomeData, expenseData, tilldays) => {
     const prompt = `
 You are an intelligent personal finance assistant.
 
-Analyze the user's financial data from the last ${tilldays} days and provide actionable insights.
+Analyze the user's financial data from ${startDate.toDateString()} to ${endDate.toDateString()} and provide actionable insights.
 
 FINANCIAL SUMMARY
 - Total Income: ₹${incomeData.totalIncome}
