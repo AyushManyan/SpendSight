@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import DashboardLayout from '../../components/Layout/DashboardLayout';
 import { Sparkles, Calendar, TrendingUp, Target, AlertCircle, ChevronLeft, ChevronRight } from 'lucide-react';
+import axiosInstance from '../../utils/axiosInstance';
+import { API_PATHS } from '../../utils/apiPath';
+import AIInsight from '../../components/AIInsight';
 
 const Insights = () => {
   const [dateRange, setDateRange] = useState({ start: '', end: '' });
@@ -13,19 +16,28 @@ const Insights = () => {
   const [dragEnd, setDragEnd] = useState(null);
   const calendarRef = useRef(null);
 
-  const handleGenerateInsight = () => {
+  const handleGenerateInsight = async () => {
     if (!dateRange.start || !dateRange.end) return;
 
     setIsAnalyzing(true);
-    setTimeout(() => {
-      const insights = {
-        spending_patterns: `Analysis of ${dateRange.start} to ${dateRange.end}: Your discretionary spending peaks on weekends (average $125 vs. weekday $45). Strategy: Set a $75 "weekend budget" to save approximately $200 monthly. Consider shifting some weekend expenses to weekdays for better deals.`,
-        savings_opportunities: `Analysis of ${dateRange.start} to ${dateRange.end}: 12% of your income goes to subscription services ($85/month). Consolidating or eliminating 2 subscriptions could boost savings by $40/month without impacting lifestyle significantly.`,
-        investment_insights: `Analysis of ${dateRange.start} to ${dateRange.end}: Based on your cash flow, you could comfortably allocate $300/month to a diversified ETF portfolio. At 7% annual return, this could grow to ~$45,000 in 8 years.`
-      };
-      setInsight(insights[analysisType]);
+
+    try {
+      const result = await axiosInstance.get(API_PATHS.INSIGHTS.GET_INSIGHTS, {
+        params: {
+          start_date: dateRange.start,
+          end_date: dateRange.end,
+        },
+        timeout: 60000
+      });
+
+    console.log("insight ", result.data.insight);
+    
+      setInsight(result.data.insight);
+    } catch (error) {
+      console.error("Failed to fetch insights", error);
+    } finally {
       setIsAnalyzing(false);
-    }, 1500);
+    }
   };
 
 
@@ -113,7 +125,7 @@ const Insights = () => {
 
   // Fix off-by-one: always set end date as the selected date, and display range inclusively
   const handleDateClick = (dayData) => {
-    if (dayData.isFuture || !dayData.isCurrentMonth) return;
+    if (dayData.isFuture) return;
     const dateString = formatDate(dayData.date);
     if (!dateRange.start || (dateRange.start && dateRange.end)) {
       setDateRange({ start: dateString, end: '' });
@@ -132,7 +144,7 @@ const Insights = () => {
   };
 
   const handleDragStart = (dayData) => {
-    if (dayData.isFuture || !dayData.isCurrentMonth) return;
+    if (dayData.isFuture) return;
     setIsDragging(true);
     const dateString = formatDate(dayData.date);
     setDateRange({ start: dateString, end: '' });
@@ -141,7 +153,7 @@ const Insights = () => {
   };
 
   const handleDragOver = (dayData) => {
-    if (!isDragging || !dragStart || dayData.isFuture || !dayData.isCurrentMonth) return;
+    if (!isDragging || !dragStart || dayData.isFuture) return;
     const dateString = formatDate(dayData.date);
     if (dateString !== dragEnd?.toISOString().split('T')[0]) {
       setDragEnd(dayData.date);
@@ -191,7 +203,7 @@ const Insights = () => {
     ? `${new Date(dateRange.start).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })} - ${new Date(dateRange.end).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`
     : 'Select a date range';
 
-  console.log("start date", dateRange);
+  
 
   return (
     <DashboardLayout active="Insights">
@@ -277,17 +289,18 @@ const Insights = () => {
                     const isToday = formatDate(today) === dateString;
                     const isSelected = dateString === dateRange.start || dateString === dateRange.end;
                     const isInRange = dayData.isInRange;
-                    const isDisabled = dayData.isFuture || !dayData.isCurrentMonth;
+                    const isDisabled = dayData.isFuture;
 
                     return (
                       <div
                         key={index}
-                        className={`relative h-8 flex items-center justify-center text-xs font-medium rounded transition-all duration-200
-                          ${isDisabled ? 'text-slate-300 cursor-default' : 'text-slate-700'}
+                        className={`relative h-8 flex items-center justify-center text-xs rounded transition-all duration-200
+                          ${isDisabled ? 'text-slate-300 cursor-default font-medium' : dayData.isCurrentMonth ? 'font-medium text-slate-700' : 'font-normal text-slate-400 opacity-60'}
                           ${isToday && !isSelected && !isDisabled ? 'bg-blue-50 border border-blue-200' : ''}
-                          ${isSelected && !isDisabled ? 'bg-indigo-600 text-white shadow-sm z-10' : ''}
-                          ${isInRange && !isSelected && !isDisabled ? 'bg-indigo-100 text-indigo-700' : ''}
-                          ${!isDisabled && dayData.isCurrentMonth && !isSelected && !isInRange ? 'hover:bg-slate-100 cursor-pointer' : ''}
+                          ${isSelected && !isDisabled ? 'bg-indigo-600 text-white shadow-sm z-10 font-semibold' : ''}
+                          ${isInRange && !isSelected && !isDisabled ? 'bg-indigo-100 text-indigo-700 font-medium' : ''}
+                          ${!isDisabled && dayData.isCurrentMonth ? 'hover:bg-slate-100 cursor-pointer' : ''}
+                          ${!isDisabled && !dayData.isCurrentMonth ? 'hover:bg-slate-100/50 cursor-pointer' : ''}
                         `}
                         onClick={() => handleDateClick(dayData)}
                         onMouseDown={() => handleDragStart(dayData)}
@@ -412,42 +425,7 @@ const Insights = () => {
 
                 {/* Results Section */}
                 {insight && (
-                  <div className="pt-3 border-t border-slate-100 animate-in fade-in slide-in-from-bottom-4 duration-700">
-                    <div className="bg-gradient-to-br from-slate-50 to-white rounded p-3 border border-slate-200 shadow-sm">
-                      <div className="flex items-start gap-2">
-                        <div className="flex-shrink-0">
-                          <div className="p-1.5 bg-gradient-to-br from-indigo-500 to-purple-600 rounded shadow-sm">
-                            <Sparkles className="w-4 h-4 text-white" />
-                          </div>
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex flex-wrap items-center gap-2 mb-1">
-                            <h3 className="text-xs font-semibold text-slate-900">AI Recommendation</h3>
-                            <span className="px-2 py-0.5 bg-indigo-100 text-indigo-800 text-xs font-medium rounded-full whitespace-nowrap">
-                              {analysisType === 'spending_patterns' ? 'Pattern Analysis' :
-                                analysisType === 'savings_opportunities' ? 'Savings Tip' : 'Investment Advice'}
-                            </span>
-                          </div>
-                          <p className="text-xs text-slate-700 leading-relaxed mb-2">
-                            {insight}
-                          </p>
-                          <div className="flex items-center gap-1 text-xs text-slate-500">
-                            <Calendar className="w-3 h-3" />
-                            <span>Analysis based on {dateRange.start} to {dateRange.end}</span>
-                          </div>
-                        </div>
-                      </div>
-                      {/* Action Buttons */}
-                      <div className="mt-3 pt-3 border-t border-slate-100 flex flex-wrap gap-2">
-                        <button className="px-2.5 py-1 bg-indigo-600 text-white text-xs font-medium rounded hover:bg-indigo-700 transition-colors whitespace-nowrap">
-                          Apply This Strategy
-                        </button>
-                        <button className="px-2.5 py-1 bg-white border border-slate-300 text-slate-700 text-xs font-medium rounded hover:bg-slate-50 transition-colors whitespace-nowrap">
-                          Save for Later
-                        </button>
-                      </div>
-                    </div>
-                  </div>
+                    <AIInsight insight={insight} />
                 )}
               </div>
             </div>

@@ -1,5 +1,5 @@
-// export const BASE_URL = "http://localhost:8000/";
-export const BASE_URL = "https://spensight.vercel.app/";
+export const BASE_URL = "http://localhost:8000/";
+// export const BASE_URL = "https://spensight.vercel.app/";
 
 
 //  utils/apiPath.js
@@ -36,6 +36,6 @@ export const API_PATHS = {
     },
 
     INSIGHTS:{
-        GET_INSIGHTS: "api/v1/insights"
+        GET_INSIGHTS: "api/v1/insight"
     }
 };

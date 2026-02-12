@@ -7,14 +7,14 @@ const DashboardLayout = ({ children, active }) => {
 
     
   return (
-    <div className=''>
+    <div className='min-h-screen'>
         <Navbar />
         {user &&(
            <div className='flex'>
-            <div className='max-[1080px]:hidden'>
+            <div className='max-[1080px]:hidden w-64 fixed left-0 top-[61px] h-[calc(100vh-61px)] z-20'>
               <SideMenu />
             </div>
-            <div className='grow mx-5 '>
+            <div className='grow ml-0 max-[1080px]:ml-0 lg:ml-64 mx-5 p-4'>
               {children}
             </div>
            </div>

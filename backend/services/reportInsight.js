@@ -19,7 +19,7 @@ exports.reportInsight = async (incomeData, expenseData, startDate, endDate) => {
     const prompt = `
 You are an intelligent personal finance assistant.
 
-Analyze the user's financial data from ${startDate.toDateString()} to ${endDate.toDateString()} and provide actionable insights.
+Analyze the user's financial data from ${startDate} to ${endDate} and provide actionable insights.
 
 FINANCIAL SUMMARY
 - Total Income: ₹${incomeData.totalIncome}
@@ -47,7 +47,12 @@ Rules:
 - Currency is INR (₹)
 `;
 
-    const result = await model.generateContent(prompt);
+    const result = await Promise.race([
+      model.generateContent(prompt),
+      new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Gemini API timeout')), 50000)
+      )
+    ]);
     return result.response.text();
   } catch (error) {
     console.error("Gemini insight error:", error);
