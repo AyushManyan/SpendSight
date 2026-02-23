@@ -15,6 +15,7 @@ import UserProvider from './context/UserContext'
 import { Toaster } from 'react-hot-toast';
 import OtpVerification from './pages/Otp/OtpVerification'
 import Insights from './pages/Insights/Insights'
+import ChatBot from './pages/ChatBotQuery/ChatBot'
 
 const App = () => {
   return (
@@ -32,6 +33,7 @@ const App = () => {
             <Route path="/expenses" element={<Expense />} />
             <Route path="/otp-verification" element={<OtpVerification />} />
             <Route path="/insights" element={<Insights />} />
+            <Route path="/chatbot" element={<ChatBot />} />
 
           </Routes>
         </Router>

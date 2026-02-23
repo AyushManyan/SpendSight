@@ -1,21 +1,33 @@
-
-const { z } = require("zod");
-
-const QuerySchema = z.object({
-  target: z.enum(["income", "expense", "both"]),
-  incomeFilter: z.object({}).passthrough(),
-  expenseFilter: z.object({}).passthrough()
-});
-
-exports.validateAIResponse = function(data) {
-  if (data.error) {
-    throw new Error(data.error);
+// utils/validateAIResponse.js
+exports.validateAIResponse = (aiResponse) => {
+  if (!aiResponse || !aiResponse.intent) {
+    throw new Error("Invalid AI response");
   }
 
-  const parsed = QuerySchema.safeParse(data);
-  if (!parsed.success) {
-    throw new Error("Invalid AI response structure");
+  if (aiResponse.intent === "DIRECT_REPLY") {
+    return aiResponse;
   }
 
-  return parsed.data;
-}
+  if (!["income", "expense", "both"].includes(aiResponse.target)) {
+    throw new Error("Invalid target");
+  }
+
+  const allowedOps = ["$gte", "$lte"];
+
+  const validateFilter = (filter) => {
+    for (const key in filter) {
+      if (typeof filter[key] === "object") {
+        for (const op in filter[key]) {
+          if (!allowedOps.includes(op)) {
+            throw new Error("Unsafe Mongo operator detected");
+          }
+        }
+      }
+    }
+  };
+
+  validateFilter(aiResponse.incomeFilter || {});
+  validateFilter(aiResponse.expenseFilter || {});
+
+  return aiResponse;
+};

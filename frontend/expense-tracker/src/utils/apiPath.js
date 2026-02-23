@@ -37,5 +37,8 @@ export const API_PATHS = {
 
     INSIGHTS:{
         GET_INSIGHTS: "api/v1/insight"
+    },
+    CHATBOT:{
+        GET_QUERY_RESPONSE: "api/v1/chat"
     }
 };
