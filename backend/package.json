@@ -2,11 +2,11 @@
   "name": "expense-tracker-backend",
   "version": "1.0.0",
   "description": "",
-  "main": "api/index.js",
+  "main": "server.js",
   "scripts": {
-    "start": "node api/index.js",
+    "start": "node server.js",
     "inngest:dev": "npx inngest dev",
-    "dev": "nodemon api/index.js"
+    "dev": "nodemon server.js"
   },
   "keywords": [],
   "author": "",
