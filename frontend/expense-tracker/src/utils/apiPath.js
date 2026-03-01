@@ -1,5 +1,6 @@
 // export const BASE_URL = "http://localhost:8000/";
-export const BASE_URL = "https://spensight.vercel.app/";
+// export const BASE_URL = "https://spendsightbackend.vercel.app";
+export const BASE_URL = "https://spendsight-964g.onrender.com/";
 
 
 //  utils/apiPath.js

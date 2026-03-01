@@ -55,6 +55,10 @@ app.use("/api/v1/chat",aiQueryRoute );
 // Serve static files from the "uploads" directory
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+app.use("/api/v1/health", (req, res) => {
+    res.status(200).json({ message: "API is healthy" });
+});
+
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
