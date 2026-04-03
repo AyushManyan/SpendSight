@@ -16,6 +16,7 @@ import { Toaster } from 'react-hot-toast';
 import OtpVerification from './pages/Otp/OtpVerification'
 import Insights from './pages/Insights/Insights'
 import ChatBot from './pages/ChatBotQuery/ChatBot'
+import Profile from './pages/Profile/Profile'
 
 const App = () => {
   return (
@@ -34,7 +35,7 @@ const App = () => {
             <Route path="/otp-verification" element={<OtpVerification />} />
             <Route path="/insights" element={<Insights />} />
             <Route path="/chatbot" element={<ChatBot />} />
-
+            <Route path="/profile" element={<Profile />} />
           </Routes>
         </Router>
       </div>

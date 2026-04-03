@@ -5,42 +5,48 @@ import{
     LuMessagesSquare,
     LuSparkles,
     LuLogOut,
+    LuUser
 } from "react-icons/lu";
 
 export const SIDE_MENU_DATA =[
     {
-        id: "01",
+        id: "00",
         label:"Dashboad",
         icon: LuLayoutDashboard,
         path:"/dashboard",
     },
     {
-        id: "02",
+        id: "01",
         label:"Income",
         icon: LuWalletMinimal,
         path:"/income",
     },
     {
-        id: "03",
+        id: "02",
         label:"Expenses",
         icon: LuHandCoins,
         path:"/expenses",
     },
 
     {
-        id: "04",
+        id: "03",
         label:"Insights",
         icon: LuSparkles,
         path:"/insights"
     },
 
     {
-        id: "05",
+        id: "04",
         label:"ChatBot",
         icon: LuMessagesSquare ,
         path:"/chatbot"
     },
-
+    {
+        id: "05",
+        label: "Profile",
+        icon: LuUser, // Replace with a user icon if available
+        path: "/profile",
+    },
     {
         id: "06",
         label:"Logout",

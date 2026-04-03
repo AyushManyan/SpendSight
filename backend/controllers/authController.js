@@ -81,3 +81,56 @@ exports.getUserInfo = async (req, res) => {
         res.status(500).json({ message: "Server error" });
     }
 };
+
+// Update User Info
+exports.updateUserInfo = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const { fullName, email, profileImageUrl } = req.body;
+
+        // Only allow updating certain fields
+        const updateFields = {};
+        if (fullName) updateFields.fullName = fullName;
+        if (email) updateFields.email = email;
+        if (profileImageUrl) updateFields.profileImageUrl = profileImageUrl;
+
+        const updatedUser = await User.findByIdAndUpdate(
+            userId,
+            { $set: updateFields },
+            { new: true, runValidators: true, select: "-password" }
+        );
+
+        if (!updatedUser) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        res.status(200).json({ user: updatedUser });
+    } catch (error) {
+        console.error("Error updating user info:", error);
+        res.status(500).json({ message: "Server error" });
+    }
+};
+// Change User Password
+exports.changePassword = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const { currentPassword, newPassword } = req.body;
+        if (!currentPassword || !newPassword) {
+            return res.status(400).json({ message: "Current and new password are required" });
+        }
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        // Check current password
+        const isMatch = await user.matchPassword(currentPassword);
+        if (!isMatch) {
+            return res.status(400).json({ message: "Current password is incorrect" });
+        }
+        user.password = newPassword;
+        await user.save();
+        res.status(200).json({ message: "Password changed successfully" });
+    } catch (error) {
+        console.error("Error changing password:", error);
+        res.status(500).json({ message: "Server error" });
+    }
+};

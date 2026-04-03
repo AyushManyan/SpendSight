@@ -51,6 +51,16 @@ app.use("/api/v1/bill", billRoutes);
 app.use("/api/v1/opt",otpRoutes);
 app.use("/api/v1/insight", insightRoutes);
 app.use("/api/v1/chat",aiQueryRoute );
+// Self-ping to keep server awake on Render
+// if (Eprocess.env.RENDR) {
+//   setInterval(() => {
+//     fetch(`http://localhost:${PORT}/wake-up`).catch(() => {});
+//   }, 14 * 60 * 1000); // every 14 minutes
+// }
+// // Endpoint to keep server awake for Render
+// app.get('/wake-up', (req, res) => {
+//   res.status(200).send('Server is awake!');
+// });
 
 // Serve static files from the "uploads" directory
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
