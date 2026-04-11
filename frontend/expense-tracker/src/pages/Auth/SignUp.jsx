@@ -8,6 +8,8 @@ import axiosInstance from '../../utils/axiosInstance'
 import { API_PATHS } from '../../utils/apiPath'
 import { UserContext } from '../../context/UserContext'
 import uploadImage from '../../utils/uploadImage'
+import toast from 'react-hot-toast';
+import Loading from '../../components/Loading'
 const SignUp = () => {
   const [profilePic, setProfilePic] = useState(null);
   const [fullName, setFullName] = useState('');
@@ -16,6 +18,7 @@ const SignUp = () => {
   const [confirmPassword, setConfirmPassword] = useState('')
 
   const [error, setError] = useState(null)
+  const [loading, setLoading] = useState(false)
 
   const {updateUser} = useContext(UserContext);
 
@@ -23,6 +26,7 @@ const SignUp = () => {
 
   const handleSubmit = async (e) => { 
     e.preventDefault();
+    if (loading) return;
     // Simple validation
     if(!fullName){
       setError("Please enter your full name.");
@@ -49,7 +53,7 @@ const SignUp = () => {
       return;
     }
     setError(null);
-    
+    setLoading(true);
     try {
       // upload image if present
       let profileImageUrl;
@@ -57,22 +61,24 @@ const SignUp = () => {
         const imgUploadRes = await uploadImage(profilePic);
         profileImageUrl = imgUploadRes.imageUrl || "";
       }
-
-      // 1. Send OTP to email
-      await axiosInstance.post(API_PATHS.OTP.SEND_OTP, { email });
-
-
-      // 2. Prepare signup data (do not send to backend yet)
+      // Directly register user (no OTP)
       const signupData = {
         fullName,
         email,
         password,
         profileImageUrl
       };
-
-      // 3. Redirect to OTP verification page, pass email and signupData
-      navigate('/otp-verification', { state: { email, signupData } });
-      toast.success("OTP sent to your email. Please verify to complete signup.");
+      const response = await axiosInstance.post(API_PATHS.AUTH.REGISTER, signupData);
+      const { token, user } = response.data;
+      if (token) {
+        localStorage.setItem('token', token);
+        localStorage.setItem('user', JSON.stringify(user));
+        updateUser(user);
+        toast.success('Account created successfully!');
+        setTimeout(() => {
+          navigate('/dashboard');
+        }, 1500);
+      }
     } catch (error) {
       if(error.response && error.response.data.message){
         setError(error.response.data.message);
@@ -81,23 +87,22 @@ const SignUp = () => {
         setError("Something went Wrong. Please try again.");
         toast.error("Something went Wrong. Please try again.");
       }
+    } finally {
+      setLoading(false);
     }
   }
 
   return (
     <AuthLayout>
+      {loading && <Loading />}
       <div className='lg:w-[100%] h-auto md:h-full mt-10 md:mt-0 flex flex-col justify-center'>
         <h3 className='text-xl font-semibold text-black'>Create an Account</h3>
         <p className='text-xs text-slate-700 mt-[5px] mb-6'>Join us today by entering your details below</p>
-
-
         <form onSubmit={handleSubmit}>
-
           <ProfilePhotoSelector
             image={profilePic}
             setImage={setProfilePic}
           />
-
           <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
             <Input
               value={fullName}
@@ -105,6 +110,7 @@ const SignUp = () => {
               type="text"
               label="Full Name"
               placeholder="Enter your full name"
+              disabled={loading}
             />
             <Input
               value={email}
@@ -112,6 +118,7 @@ const SignUp = () => {
               type="text"
               label="Email Address"
               placeholder="Enter your email"
+              disabled={loading}
             />
             <Input
               value={password}
@@ -119,6 +126,7 @@ const SignUp = () => {
               type="password"
               label="Password"
               placeholder="Min 8 characters"
+              disabled={loading}
             />
             <Input
               value={confirmPassword}
@@ -126,27 +134,21 @@ const SignUp = () => {
               type="password"
               label="Confirm Password"
               placeholder="Re-enter your password"
+              disabled={loading}
             />
-
-
           </div>
-
           {error && <p className='text-red-500 text-xs pb-2.5'>{error}</p>}
-
           <button
             type='submit'
             className='btn-primary'
+            disabled={loading}
           >
-            Sign Up
+            {loading ? 'Signing up...' : 'Sign Up'}
           </button>
-
           <p className='text-[13px] text-slate-800 mt-3'>
             Already have an account? <Link className='text-primary font-medium cursor-pointer' to="/login"> Log In</Link>
           </p>
-
         </form>
-
-
       </div>
     </AuthLayout>
   )

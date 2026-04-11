@@ -23,6 +23,7 @@ const Income = () => {
   })
 
   const [openAddIncomeModal, setOpenAddIncomeModal] = useState(false)
+  const [actionLoading, setActionLoading] = useState(false)
 
   // get all income details
 
@@ -49,6 +50,8 @@ const Income = () => {
 
   // handle add income
   const handleAddIncome = async (income) => {
+    if (actionLoading) return;
+    setActionLoading(true);
     const { source, amount, date, icon } = income;
     // validate check
     if (!source.trim()) {
@@ -77,20 +80,29 @@ const Income = () => {
     } catch (error) {
       console.error("Error adding income", error.message);
       toast.error("Failed to add income. Please try again later.");
+    } finally {
+      setActionLoading(false);
     }
   };
 
   // delete income
   const deleteIncome = async (id) => {
-    
+    if (actionLoading) return;
+    setActionLoading(true);
     try {
-      await axiosInstance.delete(API_PATHS.INCOME.DELETE_INCOME(id));
-      setOpenDeleteAlert({ show: false, data: null });
-      toast.success("Income deleted successfully");
-      fetchIncomeDetails();
+      const res = await axiosInstance.delete(API_PATHS.INCOME.DELETE_INCOME(id));
+      if (res.status === 200 || res.status === 204) {
+        setOpenDeleteAlert({ show: false, data: null });
+        toast.success("Income deleted successfully");
+        fetchIncomeDetails();
+      } else {
+        toast.error("Failed to delete income. Please try again later.");
+      }
     } catch (error) {
       console.error("Error deleting income", error.message);
       toast.error("Failed to delete income. Please try again later.");
+    } finally {
+      setActionLoading(false);
     }
   };
 
@@ -150,7 +162,8 @@ const Income = () => {
               onClose={() => setOpenAddIncomeModal(false)}
               title="Add Income"
             >
-              <AddIncomeForm onAddIncome={handleAddIncome} />
+              <AddIncomeForm onAddIncome={handleAddIncome} loading={actionLoading} />
+              {actionLoading && <Loading />}
             </Modal>
             <Modal
               isOpen={openDeleteAlert.show}
@@ -160,7 +173,9 @@ const Income = () => {
               <DeleteAlert
                 content="Are you sure you want to delete this income?"
                 onDelete={() => deleteIncome(openDeleteAlert.data)}
+                loading={actionLoading}
               />
+              {actionLoading && <Loading />}
             </Modal>
           </>
         )}

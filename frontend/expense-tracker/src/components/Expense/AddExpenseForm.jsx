@@ -9,7 +9,7 @@ import Loading from '../Loading';
 
 
 
-const AddExpenseForm = ({ onAddExpense }) => {
+const AddExpenseForm = ({ onAddExpense, loading }) => {
 
     const [expense, setExpense] = useState({
         category: "",
@@ -18,7 +18,7 @@ const AddExpenseForm = ({ onAddExpense }) => {
         icon: ""
     });
 
-    const [loading, setLoading] = useState(false);
+    const [aiLoading, setAiLoading] = useState(false);
 
     const handleChange = (key, value) => setExpense({ ...expense, [key]: value });
 
@@ -41,7 +41,7 @@ const AddExpenseForm = ({ onAddExpense }) => {
 
     const handleAutoFill = async (file) => {
         try {
-            setLoading(true);
+            setAiLoading(true);
             const formData = new FormData();
             formData.append('bill', file);
             const aiData = await axiosInstance.post(API_PATHS.EXPENSE.SCAN_EXPENSE_BILL, formData, {
@@ -67,18 +67,18 @@ const AddExpenseForm = ({ onAddExpense }) => {
             console.error("AI extraction failed, using mock data", error);
             toast.error("AI extraction failed");
         } finally {
-            setLoading(false);
+            setAiLoading(false);
         }
     };
 
     return (
         <>
         {
-            loading && (
+            aiLoading && (
                 <Loading />
             )
         }
-        <div className={`flex flex-col gap-4 ${loading ? 'opacity-50 pointer-events-none' : ''}`}>
+        <div className={`flex flex-col gap-4 ${aiLoading ? 'opacity-50 pointer-events-none' : ''}`}>
             <div className='mb-4 w-full gap-4'>
                 <label className='add-btn add-btn-outline w-full flex justify-center items-center cursor-pointer'>
                     <input
@@ -121,7 +121,7 @@ const AddExpenseForm = ({ onAddExpense }) => {
 
                 <div className='flex justify-end mt-6'>
                     <button className='add-btn add-btn-fill' type='button' onClick={() => onAddExpense(expense)} disabled={loading}>
-                        {"Add Expense"}
+                        {loading ? 'Adding...' : 'Add Expense'}
                     </button>
                 </div>
 

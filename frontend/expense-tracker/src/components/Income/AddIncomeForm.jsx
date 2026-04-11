@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import Input from '../Inputs/Input'
 import EmojiPickerPopup from '../EmojiPickerPopup';
 
-const AddIncomeForm = ({ onAddIncome }) => {
+const AddIncomeForm = ({ onAddIncome, loading }) => {
 
     const [income, setIncome] = useState({
         source:"",
@@ -49,8 +49,10 @@ const AddIncomeForm = ({ onAddIncome }) => {
             <button 
             type='button'
             onClick={() => onAddIncome(income)}
-            className='add-btn add-btn-fill'>
-                Add Income
+            className='add-btn add-btn-fill'
+            disabled={loading}
+            >
+                {loading ? 'Adding...' : 'Add Income'}
             </button>
         </div>
 

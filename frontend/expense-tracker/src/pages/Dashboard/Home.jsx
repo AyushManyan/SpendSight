@@ -48,7 +48,7 @@ const Home = () => {
     return () => { }
   }, [])
 
-  console.log("js", dashboardData);
+  
 
 
   return (

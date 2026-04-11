@@ -49,7 +49,7 @@ exports.deleteIncome = async (req, res) => {
         if (!checkIncome) {
             return res.status(404).json({ message: "Income not found" });
         }
-        await Income.findOneAndDelete(req.params.id);
+        await Income.findByIdAndDelete(req.params.id);
         res.status(200).json({ message: "Income deleted successfully" });
     } catch (error) {
         console.error("Error deleting income:", error);

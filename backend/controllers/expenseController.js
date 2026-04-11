@@ -46,7 +46,7 @@ exports.getAllExpense = async (req, res) => {
 exports.deleteExpense = async (req, res) => {
     try {
 
-        await Expense.findOneAndDelete(req.params.id);
+        await Expense.findByIdAndDelete(req.params.id);
         res.status(200).json({ message: "Expense deleted successfully" });
     } catch (error) {
         console.error("Error deleting expense:", error);

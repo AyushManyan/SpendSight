@@ -1,6 +1,4 @@
-// export const BASE_URL = "http://localhost:8000/";
-// export const BASE_URL = "https://spendsightbackend.vercel.app";
-export const BASE_URL = "https://spendsight-964g.onrender.com/";
+export const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 
 //  utils/apiPath.js
@@ -33,10 +31,6 @@ export const API_PATHS = {
         UPLOAD_IMAGE: "api/v1/auth/upload-image"
     },
 
-    OTP:{
-        SEND_OTP: "api/v1/opt/send-otp",
-        VERIFY_OTP: "api/v1/opt/verify-otp"
-    },
 
     INSIGHTS:{
         GET_INSIGHTS: "api/v1/insight"

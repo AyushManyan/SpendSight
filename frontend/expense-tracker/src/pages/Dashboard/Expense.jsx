@@ -24,6 +24,7 @@ const Expense = () => {
   })
 
   const [openAddExpenseModal, setOpenAddExpenseModal] = useState(false)
+  const [actionLoading, setActionLoading] = useState(false)
 
   // get all expense details
 
@@ -50,6 +51,8 @@ const Expense = () => {
 
   // handle add expense
   const handleAddExpense = async (expense) => {
+    if (actionLoading) return;
+    setActionLoading(true);
     const { category, amount, date, icon } = expense;
     
     // validate check
@@ -79,21 +82,29 @@ const Expense = () => {
     } catch (error) {
       console.error("Error adding expense", error.message);
       toast.error("Failed to add expense. Please try again later.");
+    } finally {
+      setActionLoading(false);
     }
   };
 
   // delete expense
   const deleteExpense = async (id) => {
-    console.log("id on delete ", id);
-
+    if (actionLoading) return;
+    setActionLoading(true);
     try {
-      await axiosInstance.delete(API_PATHS.EXPENSE.DELETE_EXPENSE(id));
-      setOpenDeleteAlert({ show: false, data: null });
-      toast.success("Expense deleted successfully");
-      fetchExpenseDetails();
+      const res = await axiosInstance.delete(API_PATHS.EXPENSE.DELETE_EXPENSE(id));
+      if (res.status === 200 || res.status === 204) {
+        setOpenDeleteAlert({ show: false, data: null });
+        toast.success("Expense deleted successfully");
+        fetchExpenseDetails();
+      } else {
+        toast.error("Failed to delete expense. Please try again later.");
+      }
     } catch (error) {
       console.error("Error deleting expense", error.message);
       toast.error("Failed to delete expense. Please try again later.");
+    } finally {
+      setActionLoading(false);
     }
   };
 
@@ -154,7 +165,8 @@ const Expense = () => {
               onClose={() => setOpenAddExpenseModal(false)}
               title="Add Expense"
             >
-              <AddExpenseForm onAddExpense={handleAddExpense} />
+              <AddExpenseForm onAddExpense={handleAddExpense} loading={actionLoading} />
+              {actionLoading && <Loading />}
             </Modal>
             <Modal
               isOpen={openDeleteAlert.show}
@@ -164,7 +176,9 @@ const Expense = () => {
               <DeleteAlert
                 content="Are you sure you want to delete this expense?"
                 onDelete={() => deleteExpense(openDeleteAlert.data)}
+                loading={actionLoading}
               />
+              {actionLoading && <Loading />}
             </Modal>
             <Modal
               isOpen={openDeleteAlert.show}
